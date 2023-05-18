@@ -2,24 +2,26 @@ import React, { Component } from 'react';
 import { BsSearch } from 'react-icons/bs';
 import css from 'components/searchBar/search-bar.module.css';
 
-// const INITIAL_STATE = {
-//   searchTag: '',
-// };
+const INITIAL_STATE = {
+  searchTag: '',
+};
 
 class SearchBar extends Component {
   state = {
     searchTag: '',
   };
 
-  // reset = () => {
-  //   this.setState({ ...INITIAL_STATE });
-  // };
+  reset = () => {
+    this.setState({ ...INITIAL_STATE });
+  };
 
   handleInputChange = event => {
-    const { value } = event.currentTarget;
-    // console.log(value);
+    const { name, value } = event.currentTarget;
+    console.log(name);
+    console.log(value);
+    
     this.setState({
-      searchTag: value,
+      [name]: value.toLowerCase(),
     });
   };
 
@@ -30,8 +32,8 @@ class SearchBar extends Component {
       alert('Input word for search');
       return;
     }
-    this.props.onSubmit(this.state);
-    // this.reset();
+    this.props.propOnSubmit(this.state.searchTag);
+    this.reset();
   };
 
   render() {
@@ -50,6 +52,8 @@ class SearchBar extends Component {
             autoFocus
             placeholder="Search images and photos"
             onChange={this.handleInputChange}
+            name="searchTag"
+            value={this.state.searchTag}
           />
         </form>
       </header>

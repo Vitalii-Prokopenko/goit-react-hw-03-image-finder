@@ -1,14 +1,16 @@
 import PropTypes from 'prop-types';
 import css from 'components/imageGalleryItem/image-gallery-item.module.css';
 
-const ImageGalleryItem = () => (
-  <li className={css['gallery-item']}>
-    <img src="" alt="" />
+const ImageGalleryItem = (webFormatURL, tags, id) => (
+  <li className={css['gallery-item']} key={id}>
+    <img src={webFormatURL} alt={tags} />
   </li>
 );
 
 ImageGalleryItem.propTypes = {
-  //   : PropTypes.string.isRequired,
+  webFormatURL: PropTypes.string.isRequired,
+  tags: PropTypes.string.isRequired,
+  id: PropTypes.string.isRequired,
 };
 
 export default ImageGalleryItem;
