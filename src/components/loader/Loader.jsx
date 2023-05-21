@@ -1,6 +1,6 @@
 import { BallTriangle } from 'react-loader-spinner';
 import PropTypes from 'prop-types';
-import css from 'components/Loader/loader.module.css';
+// import css from 'components/Loader/loader.module.css';
 
 const Loader = () => (
   <BallTriangle

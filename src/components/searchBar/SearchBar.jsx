@@ -17,8 +17,8 @@ class SearchBar extends Component {
 
   handleInputChange = event => {
     const { name, value } = event.currentTarget;
-    console.log(name);
-    console.log(value);
+    // console.log(name);
+    // console.log(value);
     
     this.setState({
       [name]: value.toLowerCase(),
