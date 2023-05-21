@@ -22,10 +22,10 @@ let searchUrl = '';
 
 class ImageGallery extends Component {
   state = {
-    images: null,
-  }
+    images: [],
+  };
 
-  componentDidUpdate(prevProps, prevState) {
+  async componentDidUpdate(prevProps, prevState) {
     if (prevProps.searchTag !== this.props.searchTag) {
       console.log(prevProps.searchTag);
       console.log(this.props.searchTag);
@@ -34,23 +34,31 @@ class ImageGallery extends Component {
       // searchParams.set('page', currentPage);
       searchUrl = `${BASE_URL}?${searchParams}`;
       console.log(searchUrl);
-      fetch(searchUrl)
-        .then(response => response.json())
-        .then(images => this.setState({ images }))
+      return await fetch(searchUrl)
+        .then(res => {
+          console.log(res);
+          return res.json();
+        })
+        .then(data => {
+          console.log(data);
+          const fetchedImages = data.hits;
+          console.log(fetchedImages);
+          this.setState(() => {
+            return { images: fetchedImages };
+          });
+          console.log(this.state.images);
+        })
         .catch(error => console.log(error));
     }
   }
 
   render() {
     const { images } = this.state;
+    console.log(images);
     return (
       <ul className={css['gallery']}>
         {images.map(image => (
-          <ImageGalleryItem
-            key={nanoid()}
-            webFormatURL={image.webFormatURL}
-            tags={image.tags}
-          />
+          <ImageGalleryItem key={image.id} image={image} />
         ))}
       </ul>
     );
