@@ -13,11 +13,11 @@ const ImageGalleryItem = ({ image }) => (
   </>
 );
 
-ImageGalleryItem.propTypes = {
-  image: PropTypes.shape({
-    webformatURL: PropTypes.string.isRequired,
-    tags: PropTypes.string.isRequired,
-  }),
-};
+// ImageGalleryItem.propTypes = {
+//   image: PropTypes.shape({
+//     webformatURL: PropTypes.string.isRequired,
+//     tags: PropTypes.string.isRequired,
+//   }),
+// };
 
 export default ImageGalleryItem;

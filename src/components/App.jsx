@@ -13,47 +13,69 @@ const searchParams = new URLSearchParams({
   q: '',
   image_type: 'photo',
   orientation: 'horizontal',
-  page: 1,
+  page: 0,
   per_page: IMAGES_PER_PAGE,
 });
 
 let searchUrl = '';
+let currentPage = 1;
 
 class App extends Component {
   state = {
     searchTag: '',
     images: [],
-    loading: false,
+    status: 'idle',
+    totalImages: 0,
+    totalPages: 0,
+    currentPage: 1,
   };
 
   async componentDidUpdate(prevProps, prevState) {
-    if (prevState.searchTag !== this.state.searchTag) {
-      // console.log(prevProps.searchTag);
-      // console.log(this.props.searchTag);
-
+    if (
+      prevState.searchTag !== this.state.searchTag ||
+      prevState.currentPage !== this.state.currentPage
+    ) {
       searchParams.set('q', this.state.searchTag);
-      // searchParams.set('page', currentPage);
+      searchParams.set('page', this.state.currentPage);
       searchUrl = `${BASE_URL}?${searchParams}`;
-      // console.log(searchUrl);
-      this.setState({loading: true});
+      this.setState({ status: 'pending' });
 
       return await fetch(searchUrl)
         .then(res => {
-          // console.log(res);
           return res.json();
         })
         .then(data => {
-          // console.log(data);
+          console.log(data);
           const fetchedImages = data.hits;
-          // console.log(fetchedImages);
-          this.setState(() => {
-            return { images: fetchedImages };
+          const totalFetchedImages = data.totalHits;
+          const totalPages = Math.ceil(totalFetchedImages / IMAGES_PER_PAGE);
+          this.setState(prevState => {
+            const imagesToShow = [...prevState.images, ...fetchedImages];
+            console.log(imagesToShow);
+            return {
+              images: imagesToShow,
+              status: 'resolved',
+              totalImages: totalFetchedImages,
+              totalPages: totalPages,
+            };
           });
-          // console.log(this.state.images);
         })
-        .catch(error => console.log(error)).finally(() => this.setState({loading: false}));
+        .catch(error => {
+          this.setState(() => {
+            console.log(error);
+            return { status: 'rejected' };
+          });
+        });
     }
   }
+
+  handleLoadMore = () => {
+    console.log('hello');
+    currentPage += 1;
+    this.setState(() => {
+      return { currentPage: currentPage };
+    });
+  };
 
   formSubmitHandler = data => {
     this.setState(() => {
@@ -62,14 +84,30 @@ class App extends Component {
   };
 
   render() {
-    return (
-      <>
-        <SearchBar propOnSubmit={this.formSubmitHandler} />
-        {this.state.loading && <Loader />}
-        <ImageGallery images={this.state.images} />
-        <Button />
-      </>
-    );
+    const { status } = this.state;
+
+    if (status === 'idle') {
+      return <SearchBar propOnSubmit={this.formSubmitHandler} />;
+    }
+
+    if (status === 'pending') {
+      return (
+        <>
+          <SearchBar propOnSubmit={this.formSubmitHandler} />
+          <Loader />
+        </>
+      );
+    }
+
+    if (status === 'resolved') {
+      return (
+        <>
+          <SearchBar propOnSubmit={this.formSubmitHandler} />
+          <ImageGallery images={this.state.images} />
+          <Button handleLoadMore={this.handleLoadMore} />
+        </>
+      );
+    }
   }
 }
 
