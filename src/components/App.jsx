@@ -69,6 +69,9 @@ class App extends Component {
     }
   }
 
+    
+  
+
   handleLoadMore = () => {
     console.log('hello');
     currentPage += 1;
