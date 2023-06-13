@@ -19,7 +19,7 @@ import * as ImageAPI from '../services/services-api';
 // });
 
 // let searchUrl = '';
-// let currentPage = 1;
+let page = 1;
 
 class App extends Component {
   state = {
@@ -35,34 +35,46 @@ class App extends Component {
 
   componentDidUpdate(prevProps, prevState) {
     const { searchTag, currentPage } = this.state;
+
+    
     if (
       prevState.searchTag !== searchTag ||
       prevState.currentPage !== currentPage
     ) {
-      ImageAPI.getImages(searchTag, currentPage).then(
-        (data) => {
+      if (prevState.searchTag !== searchTag) {
+        this.setState(() => {
+          return { currentPage: 1, images: [] };
+        });
+      }
+
+      ImageAPI.getImages(searchTag, currentPage)
+        .then(data => {
           const fetchedImages = data.hits;
           const totalFetchedImages = data.totalHits;
           console.log(fetchedImages);
           console.log(totalFetchedImages);
+
           if (fetchedImages.length === 0) {
             this.setState({ isEmpty: true });
             return;
           }
+
           this.setState(prevState => ({
             images: [...prevState.images, ...fetchedImages],
-            showBtn: currentPage < Math.ceil(totalFetchedImages / ImageAPI.perPage),
+            showBtn:
+              currentPage < Math.ceil(totalFetchedImages / ImageAPI.perPage),
             status: 'resolved',
             // currentPage: prevState.currentPage + 1,
           }));
+
           console.log(this.state.images);
-        }
-      ).catch(error => {
-        this.setState(() => {
-          console.log(error);
-          return { status: 'rejected' };
+        })
+        .catch(error => {
+          this.setState(() => {
+            console.log(error);
+            return { status: 'rejected' };
+          });
         });
-      });
 
       // searchParams.set('q', this.state.searchTag);
       // searchParams.set('page', this.state.currentPage);
@@ -89,21 +101,52 @@ class App extends Component {
       //       };
       //     });
       //   })
-        // .catch(error => {
-        //   this.setState(() => {
-        //     console.log(error);
-        //     return { status: 'rejected' };
-        //   });
-        // });
+      // .catch(error => {
+      //   this.setState(() => {
+      //     console.log(error);
+      //     return { status: 'rejected' };
+      //   });
+      // });
     }
   }
 
   handleLoadMore = () => {
     console.log('hello');
     // currentPage += 1;
-    this.setState(prevState => {
-      return { currentPage: prevState.currentPage + 1 };
+    this.setState(prevState => ({
+      currentPage: prevState.currentPage + 1,
+    }));
+    const { searchTag, currentPage } = this.state;
+
+    ImageAPI.getImages(searchTag, currentPage)
+    .then(data => {
+      const fetchedImages = data.hits;
+      const totalFetchedImages = data.totalHits;
+      console.log(fetchedImages);
+      console.log(totalFetchedImages);
+
+      if (fetchedImages.length === 0) {
+        this.setState({ isEmpty: true });
+        return;
+      }
+
+      this.setState(prevState => ({
+        images: [...prevState.images, ...fetchedImages],
+        showBtn:
+          currentPage < Math.ceil(totalFetchedImages / ImageAPI.perPage),
+        status: 'resolved',
+        // currentPage: prevState.currentPage + 1,
+      }));
+
+      console.log(this.state.images);
+    })
+    .catch(error => {
+      this.setState(() => {
+        console.log(error);
+        return { status: 'rejected' };
+      });
     });
+
   };
 
   formSubmitHandler = data => {
